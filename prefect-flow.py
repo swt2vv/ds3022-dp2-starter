@@ -45,7 +45,6 @@ def populate_queue() -> str:
     payload = resp.json()
     logger.info('Scatter API answered: %s', payload)
     return payload["sqs_url"]
-    raise NotImplementedError
 
 COUNTERS = ["ApproximateNumberOfMessages",
             "ApproximateNumberOfMessagesNotVisible",
@@ -59,7 +58,6 @@ def get_counts(queue_url: str) -> dict:
     return {"visible":   int(attrs["ApproximateNumberOfMessages"]),
             "in_flight": int(attrs["ApproximateNumberOfMessagesNotVisible"]),
             "delayed":   int(attrs["ApproximateNumberOfMessagesDelayed"])}
-    raise NotImplementedError
 
 
 @task
@@ -77,7 +75,6 @@ def monitor_queue(queue_url: str, poll_s: int = 5, timeout_s: int = 1200) -> dic
             return c
         time.sleep(poll_s)
     raise TimeoutError(f"Messages still delayed after {timeout_s} s")
-    raise NotImplementedError
 
 
 @task
@@ -114,10 +111,6 @@ def dp2_pipeline(timeout_s: int = 1200):
     queue_url = populate_queue()
     monitor_queue(queue_url)
     # TODO (Lesson 10): collect_messages -> dbt_build -> read_phrase -> submit_solution
-    collect_messages(queue_url, timeout_s = timeout_s)
-    dbt_build()
-    phrase = read_phrase()
-    submit_solution(phrase)
 
     
 if __name__ == "__main__":
