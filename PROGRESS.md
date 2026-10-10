@@ -42,8 +42,10 @@ Checkpoint A
     - `dbt/models/staging/schema.yml` with generic tests
     - A singular test in `dbt/tests/` for "exactly 21 fragments, no gaps"
     - `dbt/models/marts/assembled_phrase.sql` returns the ordered phrase
-    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/`
-    - The flow's dbt task raises on failure, so submission never runs on a bad phrase
+
+
+    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` ####Afgsdfgaga
+    - The flow's dbt task raises on failure, so submission never runs on a bad phrase ####adfgadfgadfgsd
 
     Checkpoint D
     - `submit_solution` sends `uvaid`, `phrase`, `platform="prefect"` to `dp2-submit` and logs the HTTP status (200)
@@ -52,4 +54,33 @@ Checkpoint A
 
 
 - Next:
+
+    Checkpoint F 
+    - Full-delay evidence run (`DP2_FAST=0`) completed; dashboard screenshot and receipt code in README
+    - Chaos mode (`DP2_CHAOS=1`): two consecutive runs end in PASS
+    - Duplicate messages are counted once
+    - Malformed messages are logged or stored **and deleted**; all queue counters are 0 at the end
+    - README section "Chaos round": what broke, why, and how you fixed it
+    - Repo link and self-assessed rubric submitted by **23:59, Mon 19 Oct**
+
+
 - Blocked:
+    - Unsure how to implement fail on purpose in Checkpoint C
+
+
+## Mon 19 Oct (Lesson 11)
+
+- Done
+
+    Checkpoint C
+    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` ####Afgsdfgaga
+    - The flow's dbt task raises on failure, so submission never runs on a bad phrase ####adfgadfgadfgsd
+
+
+    Checkpoint F 
+    - Full-delay evidence run (`DP2_FAST=0`) completed; dashboard screenshot and receipt code in README
+    - Chaos mode (`DP2_CHAOS=1`): two consecutive runs end in PASS
+    - Duplicate messages are counted once
+    - Malformed messages are logged or stored **and deleted**; all queue counters are 0 at the end
+    - README section "Chaos round": what broke, why, and how you fixed it
+    - Repo link and self-assessed rubric submitted by **23:59, Mon 19 Oct**
