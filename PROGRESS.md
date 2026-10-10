@@ -49,11 +49,18 @@ Checkpoint A
 
     Checkpoint D
     - `submit_solution` sends `uvaid`, `phrase`, `platform="prefect"` to `dp2-submit` and logs the HTTP status (200)
-    - `python kit/check_submission.py` prints `PASS`; receipt code pasted in your README
+    - `python kit/check_submission.py` prints `PASS`
     - `git status` shows no `.env`, `.duckdb`, `dbt/target/` or log files
 
 
 - Next:
+    Checkpoint C
+    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` ####Afgsdfgaga
+    - The flow's dbt task raises on failure, so submission never runs on a bad phrase ####adfgadfgadfgsd
+
+
+    Checkpoint D
+    -  receipt code pasted in your README
 
     Checkpoint F 
     - Full-delay evidence run (`DP2_FAST=0`) completed; dashboard screenshot and receipt code in README
