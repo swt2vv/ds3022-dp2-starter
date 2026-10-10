@@ -25,6 +25,9 @@ import boto3
 import requests
 from dotenv import load_dotenv
 from prefect import flow, task, get_run_logger
+from dbt.cli.main import dbtRunner
+import duckdb
+
 
 load_dotenv()
 
@@ -59,6 +62,19 @@ def get_counts(queue_url: str) -> dict:
             "in_flight": int(attrs["ApproximateNumberOfMessagesNotVisible"]),
             "delayed":   int(attrs["ApproximateNumberOfMessagesDelayed"])}
 
+ 
+@task
+def prepare_landing() -> None:
+    with duckdb.connect(DUCKDB_PATH) as con:
+        con.execute("create schema if not exists raw")
+        con.execute("create or replace table raw.fragments ("
+                    "order_no varchar, word varchar, "
+                    "received_at timestamp)")
+
+def stored_count(con) -> int:
+    return con.execute("select count(distinct order_no) "
+                       "from raw.fragments").fetchone()[0]
+
 
 @task
 def monitor_queue(queue_url: str, poll_s: int = 5, timeout_s: int = 1200) -> dict:
@@ -78,39 +94,86 @@ def monitor_queue(queue_url: str, poll_s: int = 5, timeout_s: int = 1200) -> dic
 
 
 @task
-def collect_messages(queue_url: str, expected: int = 21) -> int:
+def collect_messages(queue_url: str, expected: int = 21, timeout_s: int = 1200) -> int:
     """Receive, land in DuckDB, then delete. Return how many fragments are stored."""
     # TODO (Checkpoint B): MessageAttributeNames=["All"] and resp.get("Messages", [])
-    
-    raise NotImplementedError
+    logger = get_run_logger()
+    deadline = time.monotonic() + timeout_s
+    with duckdb.connect(DUCKDB_PATH) as con:
+        while time.monotonic() < deadline:
+            stored, c = stored_count(con), get_counts(queue_url)
+            logger.info("stored %d/%d | visible=%d in_flight=%d delayed=%d",
+                        stored, expected, c["visible"],
+                        c["in_flight"], c["delayed"])
+            if stored >= expected and sum(c.values()) == 0:
+                return stored
+            resp = sqs.receive_message(QueueUrl=queue_url,
+                                       MaxNumberOfMessages=10,
+                                       MessageAttributeNames=["All"],
+                                       WaitTimeSeconds=10)
+            for msg in resp.get("Messages", []):
+                a = msg["MessageAttributes"]
+                con.execute("insert into raw.fragments "
+                            "values (?, ?, current_timestamp)",
+                            [a["order_no"]["StringValue"],
+                             a["word"]["StringValue"]])
+                sqs.delete_message(QueueUrl=queue_url,
+                                   ReceiptHandle=msg["ReceiptHandle"])
+        stored = stored_count(con)
+    raise TimeoutError(f"Only {stored}/{expected} fragments "
+                       f"after {timeout_s} s")
 
 
 @task
 def dbt_build() -> None:
     """Run `dbt build --project-dir dbt --profiles-dir dbt`; raise if anything fails."""
     # TODO (Checkpoint C)
-    raise NotImplementedError
+    res = dbtRunner().invoke(["build", "--project-dir", "dbt",
+                              "--profiles-dir", "dbt"])
+    if not res.success:
+        raise RuntimeError("dbt tests failed: not submitting")
+    get_run_logger().info("dbt build passed: all tests green")
+
 
 
 @task
 def read_phrase() -> str:
     """Read the phrase from the dbt mart model in DuckDB."""
     # TODO (Checkpoint C)
-    raise NotImplementedError
+    with duckdb.connect(DUCKDB_PATH) as con:
+        n, phrase = con.execute("select fragment_count, phrase "
+                                "from assembled_phrase").fetchone()
+    get_run_logger().info("Assembled %d fragments: %s", n, phrase)
+    return phrase
 
 
 @task
 def submit_solution(phrase: str, platform: str = "prefect") -> int:
     """Send to dp2-submit with uvaid / phrase / platform attributes. Return the HTTP status code."""
     # TODO (Checkpoint D)
-    raise NotImplementedError
+    url = sqs.get_queue_url(QueueName="dp2-submit")["QueueUrl"]
+    resp = sqs.send_message(
+        QueueUrl=url, MessageBody="dp2 solution",
+        MessageAttributes={
+            "uvaid":    {"DataType": "String", "StringValue": UVA_ID},
+            "phrase":   {"DataType": "String", "StringValue": phrase},
+            "platform": {"DataType": "String", "StringValue": platform}})
+    status = resp["ResponseMetadata"]["HTTPStatusCode"]
+    get_run_logger().info("Submitted, HTTP %s", status)
+    if status != 200:
+        raise RuntimeError(f"Submission returned HTTP {status}")
+    return status
 
 
 @flow(name="dp2-pipeline", log_prints=True)
 def dp2_pipeline(timeout_s: int = 1200):
     queue_url = populate_queue()
-    monitor_queue(queue_url)
     # TODO (Lesson 10): collect_messages -> dbt_build -> read_phrase -> submit_solution
+    prepare_landing()
+    collect_messages(queue_url, timeout_s = timeout_s)
+    dbt_build()
+    phrase = read_phrase()
+    submit_solution(phrase)
 
     
 if __name__ == "__main__":
