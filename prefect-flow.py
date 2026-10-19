@@ -147,7 +147,7 @@ def read_phrase() -> str:
     return phrase
 
 
-@task
+@task(retries=2, retry_delay_seconds=5)
 def submit_solution(phrase: str, platform: str = "prefect") -> int:
     """Send to dp2-submit with uvaid / phrase / platform attributes. Return the HTTP status code."""
     # TODO (Checkpoint D)
