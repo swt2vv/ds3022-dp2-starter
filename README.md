@@ -280,7 +280,7 @@ queue counters, running dbt, and submitting the phrase.
 
 ![Full-delay Prefect run](docs/15_Minute_Run.png)
 
-## dbt Output
+### dbt Output
 
 The successful dbt build creates the staging and mart models and passes the
 generic and singular tests.
@@ -289,14 +289,17 @@ generic and singular tests.
 
 
 
-The intentionally fails:
+### First intentionally fails:
 
 ![First Fail dbt build](docs/CheckpointC_dbt_Build_One_Fail.png)
 
-![Second Fail dbt build](docs/CheckpointC_dbt_Build_Two_Fail.png)
+### Second intentionally fails:
+
+![Second Fail dbt build](docs/CheckpointC_dbt_Build_Two_Fails.png)
 
 
-Restored dbt run:
+### Restored dbt run:
+
 ![Restored dbt built](docs/CheckpointC_dbt_Build_Completed_After_Fails.png)
 
 
@@ -336,5 +339,3 @@ The collection loop verifies that the final visible, in-flight, and delayed coun
 ### The chaos evidence:
 
 ![Chaos Checks](docs/Chaos_2_Checks.png)
-
-Message processing must assume retries and invalid input. Saving before deleting protects against data loss, while validation and dbt tests prevent bad or incomplete data from becoming a submitted phrase.
