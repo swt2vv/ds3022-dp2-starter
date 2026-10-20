@@ -1,10 +1,8 @@
 # Progress log
 
-Add a new entry at the end of every session (and whenever you stop working).
 
 ## Mon 05 Oct (Lesson 9)
 - Done:
-
 Checkpoint A
     - Virtual environment active, `.env` has `UVA_ID`, and `python kit/smoke_test.py` prints `Emulator OK`
     - Written code for `populate_queue` POSTs to the scatter API and logs queue URL
@@ -45,7 +43,7 @@ Checkpoint A
 
 
     - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` ####Afgsdfgaga
-    - The flow's dbt task raises on failure, so submission never runs on a bad phrase ####adfgadfgadfgsd
+    - The flow's dbt task raises on failure, so submission never runs on a bad phrase 
 
     Checkpoint D
     - `submit_solution` sends `uvaid`, `phrase`, `platform="prefect"` to `dp2-submit` and logs the HTTP status (200)
@@ -55,8 +53,8 @@ Checkpoint A
 
 - Next:
     Checkpoint C
-    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` ####Afgsdfgaga
-    - The flow's dbt task raises on failure, so submission never runs on a bad phrase ####adfgadfgadfgsd
+    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` 
+    - The flow's dbt task raises on failure, so submission never runs on a bad phrase 
 
 
     Checkpoint D
@@ -80,8 +78,8 @@ Checkpoint A
 - Done
 
     Checkpoint C
-    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` ####Afgsdfgaga
-    - The flow's dbt task raises on failure, so submission never runs on a bad phrase ####adfgadfgadfgsd
+    - You made the tests **fail on purpose** (delete a row, duplicate a row in `raw.fragments`) and then pass again; screenshots in `docs/` 
+    - The flow's dbt task raises on failure, so submission never runs on a bad phrase 
 
 
     Checkpoint F 
@@ -90,4 +88,4 @@ Checkpoint A
     - Duplicate messages are counted once
     - Malformed messages are logged or stored **and deleted**; all queue counters are 0 at the end
     - README section "Chaos round": what broke, why, and how you fixed it
-    - Repo link and self-assessed rubric submitted by **23:59, Mon 19 Oct**
+    - Repo link and self-assessed rubric submitted by **23:59, Tue 20 Oct**
